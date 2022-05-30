@@ -2,13 +2,13 @@
   "name": "keksobooking",
   "version": "22.0.0",
   "private": true,
-  "description": "Личный проект «{{projectTitle}}» от HTML Academy",
+  "description": "Личный проект «{{keksobooking}}» от HTML Academy",
   "repository": {
     "type": "git",
-    "url": "{{sshUrl}}"
+    "url": "git@github.com:Core2-0/HTML-Academy_Keksobooking.git"
   },
   "bugs": {
-    "url": "{{bugsUrl}}"
+    "url": "bugsUrl"
   },
   "devDependencies": {
     "browser-sync": "2.26.14",
