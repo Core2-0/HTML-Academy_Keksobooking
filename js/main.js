@@ -1,2 +1,2 @@
-import './data.js';
-import './advertisement.js';
+import './form.js';
+import './map.js';
