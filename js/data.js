@@ -1,7 +1,7 @@
 import { getRandomInt, getRandomFloat } from './util/math-util.js';
 import { getRandomElement, getUniqueIndex, getRandomLengthArray } from './util/array-util.js';
 
-const ADVERTISEMENT_QUANTITY = 10;
+const ADVERTISE_QUANTITY = 10;
 
 const Rooms = {
   MIN: 1,
@@ -11,11 +11,6 @@ const Rooms = {
 const Guests = {
   MIN: 1,
   MAX: 20,
-};
-
-const Prices = {
-  MIN: 2000,
-  MAX: 5000,
 };
 
 const Coordinates = {
@@ -40,6 +35,7 @@ const TITLES = [
 const OBJECT_TYPES = [
   'palace',
   'flat',
+  'hotel',
   'house',
   'bungalow',
 ];
@@ -78,8 +74,22 @@ const PHOTO_SOURCES = [
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg',
 ];
 
+const getPrice = (objectType) => {
+  const minPrice = {
+    bungalow: 0,
+    flat: 1000,
+    hotel: 3000,
+    house: 5000,
+    palace: 10000,
+  }
+  return {
+    MIN: minPrice[objectType],
+    MAX: 1000000,
+  }
+}
+
 const createAuthor = (photoIndex) => {
-  const nameLength = String(ADVERTISEMENT_QUANTITY).length;
+  const nameLength = String(ADVERTISE_QUANTITY).length;
   const photoName = new Array(nameLength - String(photoIndex).length).fill('0').join() + photoIndex;
   return  {
     avatar: `img/avatars/user${photoName}.png`,
@@ -94,11 +104,12 @@ const createLocation = (xMin = Coordinates.X.MIN, xMax = Coordinates.X.MAX, yMin
 };
 
 const createOffer = (coordinateX, coordinateY) => {
+  const offerType = getRandomElement(OBJECT_TYPES);
   return {
     title: getRandomElement(TITLES),
     address: `${coordinateX}, ${coordinateY}`,
-    price: getRandomInt(Prices.MIN, Prices.MAX),
-    type: getRandomElement(OBJECT_TYPES),
+    price: getRandomInt(getPrice(offerType).MIN, getPrice(offerType).MAX),
+    type: offerType,
     rooms: getRandomInt(Rooms.MIN, Rooms.MAX),
     guests: getRandomInt(Guests.MIN, Guests.MAX),
     checkin: getRandomElement(TIMES_TO_CHECK_IN),
@@ -109,13 +120,13 @@ const createOffer = (coordinateX, coordinateY) => {
   };
 };
 
-const createAdvertisement = () => {
-  const getIndex = getUniqueIndex(1, ADVERTISEMENT_QUANTITY);
-  const advertisements = new Array(ADVERTISEMENT_QUANTITY).fill(null).map(() => {
+const createAdvertise = () => {
+  const getIndex = getUniqueIndex(1, ADVERTISE_QUANTITY);
+  const advertises = new Array(ADVERTISE_QUANTITY).fill(null).map(() => {
     const getLocation = createLocation();
     return Object.assign({}, { author: createAuthor(getIndex()) }, { offer: createOffer(getLocation.x, getLocation.y) }, { location: getLocation });
   });
-  return advertisements;
+  return advertises;
 };
 
-export { createAdvertisement };
+export { createAdvertise, getPrice };
