@@ -88,6 +88,8 @@ const setUsualMarker = (similarAdvertise) => {
   });
 };
 
+setMainMarkerDefault();
+
 mainMarker.on('move', (evt) => {
   setAddress(evt.target.getLatLng().lat, evt.target.getLatLng().lng);
 });

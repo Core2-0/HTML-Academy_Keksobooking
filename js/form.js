@@ -1,12 +1,9 @@
-import { getPrice } from './data.js';
+import { checkEmptyField, checkValidePrice, checkValideTitle } from './validation.js';
+import { sendData } from './api.js';
+import { createFormMessage, showFormMessage } from './util/util-util.js';
+import { setMainMarkerDefault } from './map.js';
 
-const MAX_PRICE = 1000000;
 const ACCURACY = 5;
-
-const  TITLE_LENGTHS = {
-  MIN: 30,
-  MAX: 100,
-};
 
 const ROOM_VALUES = {
   1: [1],
@@ -16,23 +13,28 @@ const ROOM_VALUES = {
 };
 
 const adForm = document.querySelector('.ad-form');
-const submitButton = adForm.querySelector('.ad-form__submit');
+const adTitleInput = adForm.querySelector('#title');
+const inputAddress = adForm.querySelector('#address');
 const houseType = adForm.querySelector('#type');
 const housePriceInput = adForm.querySelector('#price');
 const checkinTime = adForm.querySelector('#timein');
 const checkoutTime = adForm.querySelector('#timeout');
-const inputAddress = adForm.querySelector('#address');
-const adTitleInput = adForm.querySelector('#title');
 const roomNumberSelect = adForm.querySelector('#room_number');
 const capacitySelect = adForm.querySelector('#capacity');
 
-const checkEmptyField = (field) => {
-  if (field.validity.valueMissing) {
-    field.setCustomValidity('Обязательное поле!');
+const getPrice = (objectType) => {
+  const minPrice = {
+    bungalow: 0,
+    flat: 1000,
+    hotel: 3000,
+    house: 5000,
+    palace: 10000,
   }
-};
-
-// Минимальное значение цены в зависимости от типа жилья и валидация
+  return {
+    MIN: minPrice[objectType],
+    MAX: 1000000,
+  }
+}
 
 const setMinPrice = (offerType = houseType.value) => {
   housePriceInput.placeholder = getPrice(offerType).MIN;
@@ -45,27 +47,6 @@ houseType.addEventListener('change', () => {
   setMinPrice();
 });
 
-const checkValidePrice = (priceField, type, price) => {
-  if (price < getPrice(type).MIN) {
-    priceField.setCustomValidity(`Цена не может быть меньше ${housePriceInput.min}`);
-  } else if (price > getPrice(type).MAX) {
-    priceField.setCustomValidity(`Цена не может быть больше ${MAX_PRICE}`);
-  } else {
-    priceField.setCustomValidity('');
-  }
-};
-
-housePriceInput.addEventListener('invalid', () => {
-  checkEmptyField(housePriceInput);
-});
-
-housePriceInput.addEventListener('input', () => {
-  checkValidePrice(housePriceInput, houseType.value, housePriceInput.value);
-  housePriceInput.reportValidity();
-});
-
-// Синхронизация времени заезда и выезда
-
 checkinTime.addEventListener('change', () => {
   checkoutTime.value = checkinTime.value;
 });
@@ -74,35 +55,9 @@ checkoutTime.addEventListener('change', () => {
   checkinTime.value = checkoutTime.value;
 });
 
-// Функция для установки координат в поле адресс
-
 const setAddress = (lat, lng) => {
   inputAddress.value = `${lat.toFixed(ACCURACY)}, ${lng.toFixed(ACCURACY)}`;
 };
-
-// Валидация формы заголовка объявления
-
-const checkValideTitle = (titleField, titleLength) => {
-  if (titleLength < TITLE_LENGTHS.MIN) {
-    titleField.setCustomValidity(`Введите ещё ${TITLE_LENGTHS.MIN - titleLength} симв.`);
-  } else if (titleLength > TITLE_LENGTHS.MAX) {
-    titleField.setCustomValidity(`Заголовок не может превышать ${titleLength - TITLE_LENGTHS.MAX} симв.`);
-  } else {
-    titleField.setCustomValidity('');
-  }
-}
-
-adTitleInput.addEventListener('invalid', () => {
-  checkEmptyField(adTitleInput);
-});
-
-adTitleInput.addEventListener('input', () => {
-  const titleLength = adTitleInput.value.length;
-  checkValideTitle(adTitleInput, titleLength);
-  adTitleInput.reportValidity();
-})
-
-// Валидация комнат и гостей
 
 const disabledCapacityOptions = (inputValue) => {
   const capacityOptions = capacitySelect.querySelectorAll('option');
@@ -123,26 +78,52 @@ roomNumberSelect.addEventListener('change', () => {
   disabledCapacityOptions(roomNumberSelect.value);
 });
 
-const checkGuest = () => {
-  const roomGuests = ROOM_VALUES[roomNumberSelect.value];
+housePriceInput.addEventListener('invalid', () => {
+  checkEmptyField(housePriceInput);
+});
 
-  if (roomGuests.indexOf(+capacitySelect.value) === -1) {
-    capacitySelect.setCustomValidity('Количество гостей не соответствует выбранному количеству комнат');
-  } else {
-    capacitySelect.setCustomValidity('');
-  }
+housePriceInput.addEventListener('input', () => {
+  checkValidePrice(housePriceInput, houseType.value, housePriceInput.value);
+  housePriceInput.reportValidity();
+});
+
+adTitleInput.addEventListener('invalid', () => {
+  checkEmptyField(adTitleInput);
+});
+
+adTitleInput.addEventListener('input', () => {
+  const titleLength = adTitleInput.value.length;
+  checkValideTitle(adTitleInput, titleLength);
+  adTitleInput.reportValidity();
+});
+
+const clearForm = () => {
+  adForm.reset();
+  setMainMarkerDefault();
+};
+const resetButton = adForm.querySelector('.ad-form__reset')
+resetButton.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  clearForm();
+});
+
+const setAdFormSubmit = (onSuccess, onFail) => {
+  adForm.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    const formData = new FormData(evt.target);
+    sendData(() => onSuccess(), () => onFail(), formData);
+  });
 };
 
-roomNumberSelect.addEventListener('change', (evt) => {
-  evt.target.setCustomValidity('');
-});
+const setSuccesForm = () => {
+  showFormMessage(createFormMessage('success', 'success'));
+  clearForm();
+};
 
-capacitySelect.addEventListener('change', (evt) => {
-  evt.target.setCustomValidity('');
-});
+const setErrorForm = () => {
+  showFormMessage(createFormMessage('error', 'error'));
+};
 
-submitButton.addEventListener('click', () => {
-  checkGuest();
-});
+setAdFormSubmit(setSuccesForm, setErrorForm);
 
-export { setAddress };
+export { getPrice, setAddress };

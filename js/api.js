@@ -1,3 +1,7 @@
+import { setUsualMarker } from './map.js';
+import { showErrorMessage, createErrorMessage } from './util/util-util.js';
+import { setInactiveState } from './page-state.js';
+
 const getData = (onSuccess, onFail) => {
   fetch('https://23.javascript.pages.academy/keksobooking/data')
     .then((response) => {
@@ -12,4 +16,25 @@ const getData = (onSuccess, onFail) => {
     .catch(() => onFail());
 };
 
-export { getData };
+const sendData = (onSuccess, onFail, body) => {
+  setInactiveState();
+  fetch(
+    'https://23.javascript.pages.academy/keksobooking',
+    {
+      method: 'POST',
+      body,
+    },
+  )
+    .then((response) => {
+      if (response.ok) {
+        onSuccess();
+      } else {
+        onFail()
+      }
+    })
+    .catch(() => onFail());
+};
+
+getData((advertise) => setUsualMarker(advertise), () => showErrorMessage(createErrorMessage));
+
+export { getData, sendData };

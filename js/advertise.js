@@ -1,3 +1,5 @@
+import { createSentence } from './util/declension-util.js';
+
 const TYPES_OF_HOUSING = {
   FLAT: 'Квартира',
   BUNGALOW: 'Бунгало',
@@ -8,33 +10,6 @@ const TYPES_OF_HOUSING = {
 
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
 
-const getWordDeclension = (elementsCount) => {
-  let wordDeclension = {
-    ROOM: 'комнат',
-    GUEST: 'гостей',
-  };
-
-  if (elementsCount === 1) {
-    wordDeclension = {
-      ROOM: 'комната',
-      GUEST: 'гостя',
-    }
-  }
-
-  if (elementsCount > 1 && elementsCount <=4) {
-    wordDeclension = {
-      ROOM: 'комнаты',
-      GUEST: 'гостей',
-    }
-  }
-  return wordDeclension;
-};
-
-const createSentence = (roomCount, guestCount) => {
-  return `${roomCount} ${getWordDeclension(roomCount).ROOM} для ${guestCount} ${getWordDeclension(guestCount).GUEST}`
-};
-
-// лучше переписать!!!!
 const showFeatures = (parentBlock, availableFeatures) => {
   const allFeatures = parentBlock.querySelectorAll('.popup__feature');
 
@@ -79,9 +54,9 @@ const renderSimilarAdvertise = ({ author, offer }) => {
   cardItem.querySelector('.popup__title').textContent = offer.title;
   cardItem.querySelector('.popup__text--address').textContent = offer.address;
   cardItem.querySelector('.popup__text--price').textContent = `${offer.price} ₽/ночь`;
-  cardItem.querySelector('.popup__type').textContent = TYPES_OF_HOUSING[offer.type];
+  cardItem.querySelector('.popup__type').textContent = TYPES_OF_HOUSING[offer.type.toUpperCase()];
   cardItem.querySelector('.popup__text--time').textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`;
-  cardItem.querySelector('.popup__text--capacity').textContent = createSentence (offer.rooms, offer.guests);
+  cardItem.querySelector('.popup__text--capacity').textContent = createSentence(offer.rooms, offer.guests);
   showProperties(cardItem.querySelector('.popup__feature'), offer.features);
   cardItem.querySelector('.popup__description').textContent = offer.description;
   showProperties(cardItem.querySelector('.popup__photos'), offer.photos);
@@ -89,4 +64,4 @@ const renderSimilarAdvertise = ({ author, offer }) => {
   return cardItem;
 };
 
-export { renderSimilarAdvertise, getWordDeclension };
+export { renderSimilarAdvertise };
