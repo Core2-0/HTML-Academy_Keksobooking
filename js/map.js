@@ -1,13 +1,12 @@
 import { setInactiveState, setActiveState } from './page-state.js';
 import { setAddress } from './form.js';
-import { createAdvertise } from './data.js';
-import { createCustomPopup } from './advertise.js';
+import { renderSimilarAdvertise } from './advertise.js';
 import * as L from '../leaflet/leaflet-src.esm.js';
 
-const centerMap = {
+const DEFAULT_POSITION = {
   LAT: 35.681729,
   LNG: 139.753927,
-  ZOOM: 12,
+  ZOOM: 14,
 };
 
 const PIN_SIZES = {
@@ -28,9 +27,9 @@ setInactiveState();
 const map = L.map(mapCanvas).on('load', () => {
   setActiveState();
 }).setView({
-  lat: centerMap.LAT,
-  lng: centerMap.LNG,
-}, centerMap.ZOOM);
+  lat: DEFAULT_POSITION.LAT,
+  lng: DEFAULT_POSITION.LNG,
+}, DEFAULT_POSITION.ZOOM);
 
 L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -46,17 +45,10 @@ const mainPinIcon = L.icon({
   popupAnchor: [0, -PIN_SIZES.USUAL.Y / 2],
 });
 
-const usualPinIcon = L.icon({
-  iconUrl: 'img/pin.svg',
-  iconSize: [PIN_SIZES.USUAL.X, PIN_SIZES.USUAL.Y],
-  iconAnchor: [PIN_SIZES.USUAL.X / 2, PIN_SIZES.USUAL.Y],
-  popupAnchor: [0, -PIN_SIZES.USUAL.Y / 2],
-});
-
 const mainMarker = L.marker(
   {
-    lat: centerMap.LAT,
-    lng: centerMap.LNG,
+    lat: DEFAULT_POSITION.LAT,
+    lng: DEFAULT_POSITION.LNG,
   },
   {
     draggable: true,
@@ -64,30 +56,42 @@ const mainMarker = L.marker(
   },
 );
 
-mainMarker.addTo(map);
-
-const setUsualMarker = (advertise) => {
-  const usualMarker = L.marker(
-    {
-      lat: advertise.location.x,
-      lng: advertise.location.y,
-    },
-    {
-      icon: usualPinIcon,
-    },
-  );
-  usualMarker.addTo(map).bindPopup(createCustomPopup(advertise)),
-  {
-    keepInView: true,
-  };
+const setMainMarkerDefault = () => {
+  mainMarker.setLatLng([DEFAULT_POSITION.LAT, DEFAULT_POSITION.LNG]);
+  setAddress(DEFAULT_POSITION.LAT, DEFAULT_POSITION.LNG);
 };
 
-createAdvertise().forEach((element) => {
-  setUsualMarker(element);
+mainMarker.addTo(map);
+
+const usualPinIcon = L.icon({
+  iconUrl: 'img/pin.svg',
+  iconSize: [PIN_SIZES.USUAL.X, PIN_SIZES.USUAL.Y],
+  iconAnchor: [PIN_SIZES.USUAL.X / 2, PIN_SIZES.USUAL.Y],
+  popupAnchor: [0, -PIN_SIZES.USUAL.Y / 2],
 });
 
-setAddress(centerMap.LAT, centerMap.LNG);
+const setUsualMarker = (similarAdvertise) => {
+  similarAdvertise.forEach(({ author, offer, location }) => {
+    const usualMarker = L.marker(
+      {
+        lat: location.lat,
+        lng: location.lng,
+      },
+      {
+        icon: usualPinIcon,
+      },
+    );
+    usualMarker.addTo(map).bindPopup(renderSimilarAdvertise({ author, offer, location })),
+    {
+      keepInView: true,
+    };
+  });
+};
+
+setMainMarkerDefault();
 
 mainMarker.on('move', (evt) => {
   setAddress(evt.target.getLatLng().lat, evt.target.getLatLng().lng);
 });
+
+export { setUsualMarker, setMainMarkerDefault };
