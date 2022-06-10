@@ -1,7 +1,9 @@
 import { setInactiveState, setActiveState } from './page-state.js';
 import { setAddress } from './form.js';
-import { renderSimilarAdvertise } from './advertise.js';
+import { renderAdvertise } from './advertise.js';
 import * as L from '../leaflet/leaflet-src.esm.js';
+
+const SHOW_ADVERTISE_COUNT = 10;
 
 const DEFAULT_POSITION = {
   LAT: 35.681729,
@@ -81,7 +83,7 @@ const setUsualMarker = (similarAdvertise) => {
         icon: usualPinIcon,
       },
     );
-    usualMarker.addTo(map).bindPopup(renderSimilarAdvertise({ author, offer, location })),
+    usualMarker.addTo(map).bindPopup(renderAdvertise({ author, offer, location })),
     {
       keepInView: true,
     };
