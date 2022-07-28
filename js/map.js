@@ -72,23 +72,53 @@ const usualPinIcon = L.icon({
   popupAnchor: [0, -PIN_SIZES.USUAL.Y / 2],
 });
 
-const setUsualMarker = (similarAdvertise) => {
-  similarAdvertise.forEach(({ author, offer, location }) => {
-    const usualMarker = L.marker(
-      {
-        lat: location.lat,
-        lng: location.lng,
-      },
-      {
-        icon: usualPinIcon,
-      },
-    );
-    usualMarker.addTo(map).bindPopup(renderAdvertise({ author, offer, location })),
+const markers = [];
+
+const setUsualMarker = (advertise) => {
+  const marker = L.marker(
+    {
+      lat: advertise.location.lat,
+      lng: advertise.location.lng,
+    },
+    {
+      icon: usualPinIcon,
+    });
+
+  marker.addTo(map).bindPopup(renderAdvertise(advertise),
     {
       keepInView: true,
-    };
+    },
+  );
+  markers.push(marker);
+};
+
+const renderPins = (advertise) => {
+  advertise.slice(0, SHOW_ADVERTISE_COUNT).forEach((place) => {
+    setUsualMarker(place);
   });
 };
+
+const removePins = () => {
+  markers.forEach((marker) => marker.remove());
+};
+
+// const setUsualMarker = (similarAdvertise) => {
+//   similarAdvertise.forEach(({ author, offer, location }) => {
+//     const usualMarker = L.marker(
+//       {
+//         lat: location.lat,
+//         lng: location.lng,
+//       },
+//       {
+//         icon: usualPinIcon,
+//       },
+//     );
+//     usualMarker.addTo(map).bindPopup(renderAdvertise({ author, offer, location })),
+//     {
+//       keepInView: true,
+//     };
+//   });
+// };
 
 setMainMarkerDefault();
 
@@ -96,4 +126,4 @@ mainMarker.on('move', (evt) => {
   setAddress(evt.target.getLatLng().lat, evt.target.getLatLng().lng);
 });
 
-export { setUsualMarker, setMainMarkerDefault };
+export { setUsualMarker, setMainMarkerDefault, renderPins, removePins };
