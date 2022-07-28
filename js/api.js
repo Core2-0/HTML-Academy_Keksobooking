@@ -1,5 +1,5 @@
-import { setUsualMarker, renderPins, removePins } from './map.js';
-import { showErrorMessage, createErrorMessage } from './util/util-util.js';
+import { renderPins, removePins } from './map.js';
+import { showErrorMessage, createErrorMessage, debounce } from './util/util-util.js';
 import { setInactiveState } from './page-state.js';
 import { changeFilters, checkAllFilters } from './filter.js';
 
@@ -38,10 +38,10 @@ const sendData = (onSuccess, onFail, body) => {
 
 getData((advertise) => {
   renderPins(advertise);
-  changeFilters(() => {
+  changeFilters(debounce(() => {
     removePins();
     renderPins(checkAllFilters(advertise));
-  });
+  }));
 }, () => showErrorMessage(createErrorMessage));
 
 export { getData, sendData };
