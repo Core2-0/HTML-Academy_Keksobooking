@@ -1,7 +1,9 @@
 import { setInactiveState, setActiveState } from './page-state.js';
 import { setAddress } from './form.js';
 import { renderAdvertise } from './advertise.js';
-import * as L from '../leaflet/leaflet-src.esm.js';
+import './../../build/leaflet/leaflet/leaflet.js';
+
+const L = window.L;
 
 const SHOW_ADVERTISE_COUNT = 10;
 
