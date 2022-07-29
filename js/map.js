@@ -102,24 +102,6 @@ const removePins = () => {
   markers.forEach((marker) => marker.remove());
 };
 
-// const setUsualMarker = (similarAdvertise) => {
-//   similarAdvertise.forEach(({ author, offer, location }) => {
-//     const usualMarker = L.marker(
-//       {
-//         lat: location.lat,
-//         lng: location.lng,
-//       },
-//       {
-//         icon: usualPinIcon,
-//       },
-//     );
-//     usualMarker.addTo(map).bindPopup(renderAdvertise({ author, offer, location })),
-//     {
-//       keepInView: true,
-//     };
-//   });
-// };
-
 setMainMarkerDefault();
 
 mainMarker.on('move', (evt) => {

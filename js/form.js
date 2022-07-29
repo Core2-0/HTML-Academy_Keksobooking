@@ -2,6 +2,7 @@ import { checkEmptyField, checkValidePrice, checkValideTitle } from './validatio
 import { sendData } from './api.js';
 import { createFormMessage, showFormMessage } from './util/util-util.js';
 import { setMainMarkerDefault } from './map.js';
+import { loadPhoto } from './photo.js';
 
 const ACCURACY = 5;
 
@@ -21,6 +22,11 @@ const checkinTime = adForm.querySelector('#timein');
 const checkoutTime = adForm.querySelector('#timeout');
 const roomNumberSelect = adForm.querySelector('#room_number');
 const capacitySelect = adForm.querySelector('#capacity');
+const avatarChooser = adForm.querySelector('.ad-form__field input[type=file]');
+const avatarPreview = adForm.querySelector('.ad-form-header__preview img');
+const housePhoto = adForm.querySelector('.ad-form__upload input[type=file]');
+const housePhotoContainer = adForm.querySelector('.ad-form__photo');
+const housePhotoPreview = adForm.querySelector('.ad-form__photo img');
 
 const getPrice = (objectType) => {
   const minPrice = {
@@ -125,5 +131,10 @@ const setErrorForm = () => {
 };
 
 setAdFormSubmit(setSuccesForm, setErrorForm);
+
+avatarChooser.addEventListener('change', () => loadPhoto(avatarChooser, avatarPreview));
+housePhoto.addEventListener('change', () => {
+  loadPhoto(housePhoto, housePhotoPreview, housePhotoContainer);
+});
 
 export { getPrice, setAddress };
