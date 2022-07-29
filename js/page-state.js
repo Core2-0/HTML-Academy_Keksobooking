@@ -1,7 +1,8 @@
 const adForm = document.querySelector('.ad-form');
-const newOfferFormElements = adForm.querySelectorAll('.ad-form__element');
+const adFormElements = adForm.querySelectorAll('.ad-form__element');
 const mapFilters = document.querySelector('.map__filters');
-const mapFiltersFormElements = mapFilters.querySelectorAll('.map__filter');
+const mapFiltersFormElements = mapFilters.querySelectorAll('.map__filter, .map__features');
+const inputs = adForm.querySelectorAll('input[type=file]');
 
 const setInactiveState = () => {
   const setElementsDisabled = (elements) => {
@@ -12,8 +13,9 @@ const setInactiveState = () => {
 
   adForm.classList.add('ad-form--disabled');
   mapFilters.classList.add('map__filters--disabled');
-  setElementsDisabled(newOfferFormElements);
+  setElementsDisabled(adFormElements);
   setElementsDisabled(mapFiltersFormElements);
+  setElementsDisabled(inputs);
 };
 
 
@@ -26,7 +28,8 @@ const setActiveState = () => {
 
   adForm.classList.remove('ad-form--disabled');
   mapFilters.classList.remove('map__filters--disabled');
-  setElementsActive(newOfferFormElements);
+  setElementsActive(adFormElements);
   setElementsActive(mapFiltersFormElements);
+  setElementsActive(inputs);
 };
 export { setInactiveState, setActiveState };

@@ -1,7 +1,9 @@
 import { setInactiveState, setActiveState } from './page-state.js';
 import { setAddress } from './form.js';
-import { renderSimilarAdvertise } from './advertise.js';
+import { renderAdvertise } from './advertise.js';
 import * as L from '../leaflet/leaflet-src.esm.js';
+
+const SHOW_ADVERTISE_COUNT = 10;
 
 const DEFAULT_POSITION = {
   LAT: 35.681729,
@@ -70,22 +72,34 @@ const usualPinIcon = L.icon({
   popupAnchor: [0, -PIN_SIZES.USUAL.Y / 2],
 });
 
-const setUsualMarker = (similarAdvertise) => {
-  similarAdvertise.forEach(({ author, offer, location }) => {
-    const usualMarker = L.marker(
-      {
-        lat: location.lat,
-        lng: location.lng,
-      },
-      {
-        icon: usualPinIcon,
-      },
-    );
-    usualMarker.addTo(map).bindPopup(renderSimilarAdvertise({ author, offer, location })),
+const markers = [];
+
+const setUsualMarker = (advertise) => {
+  const marker = L.marker(
+    {
+      lat: advertise.location.lat,
+      lng: advertise.location.lng,
+    },
+    {
+      icon: usualPinIcon,
+    });
+
+  marker.addTo(map).bindPopup(renderAdvertise(advertise),
     {
       keepInView: true,
-    };
+    },
+  );
+  markers.push(marker);
+};
+
+const renderPins = (advertise) => {
+  advertise.slice(0, SHOW_ADVERTISE_COUNT).forEach((place) => {
+    setUsualMarker(place);
   });
+};
+
+const removePins = () => {
+  markers.forEach((marker) => marker.remove());
 };
 
 setMainMarkerDefault();
@@ -94,4 +108,4 @@ mainMarker.on('move', (evt) => {
   setAddress(evt.target.getLatLng().lat, evt.target.getLatLng().lng);
 });
 
-export { setUsualMarker, setMainMarkerDefault };
+export { setUsualMarker, setMainMarkerDefault, renderPins, removePins };

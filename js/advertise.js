@@ -47,7 +47,7 @@ const showProperties = (parentBlock, availableProperty) => {
   }
 };
 
-const renderSimilarAdvertise = ({ author, offer }) => {
+const renderAdvertise = ({ author, offer }) => {
   const cardItem = cardTemplate.cloneNode(true);
 
   cardItem.querySelector('.popup__avatar').src = author.avatar;
@@ -64,4 +64,4 @@ const renderSimilarAdvertise = ({ author, offer }) => {
   return cardItem;
 };
 
-export { renderSimilarAdvertise };
+export { renderAdvertise };

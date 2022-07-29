@@ -59,4 +59,12 @@ const showFormMessage = (templateElement) => {
   setActiveState();
 };
 
-export { createErrorMessage, showErrorMessage, createFormMessage, showFormMessage };
+const debounce = (cb, timeout = 500) => {
+  let timeoutID;
+  return (...rest) => {
+    clearTimeout(timeoutID);
+    timeoutID = setTimeout(() => cb.apply(this, rest), timeout);
+  };
+};
+
+export { createErrorMessage, showErrorMessage, createFormMessage, showFormMessage, debounce };

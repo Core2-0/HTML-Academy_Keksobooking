@@ -1,9 +1,13 @@
-import { setUsualMarker } from './map.js';
-import { showErrorMessage, createErrorMessage } from './util/util-util.js';
+import { renderPins, removePins } from './map.js';
+import { showErrorMessage, createErrorMessage, debounce } from './util/util-util.js';
 import { setInactiveState } from './page-state.js';
+import { changeFilters, checkAllFilters } from './filter.js';
+
+const GET_DATA = 'https://23.javascript.pages.academy/keksobooking/data';
+const POST_SERVER = 'https://23.javascript.pages.academy/keksobooking';
 
 const getData = (onSuccess, onFail) => {
-  fetch('https://23.javascript.pages.academy/keksobooking/data')
+  fetch(GET_DATA)
     .then((response) => {
       if (response.ok) {
         const advertise = response.json();
@@ -19,7 +23,7 @@ const getData = (onSuccess, onFail) => {
 const sendData = (onSuccess, onFail, body) => {
   setInactiveState();
   fetch(
-    'https://23.javascript.pages.academy/keksobooking',
+    POST_SERVER,
     {
       method: 'POST',
       body,
@@ -35,6 +39,12 @@ const sendData = (onSuccess, onFail, body) => {
     .catch(() => onFail());
 };
 
-getData((advertise) => setUsualMarker(advertise), () => showErrorMessage(createErrorMessage));
+getData((advertise) => {
+  renderPins(advertise);
+  changeFilters(debounce(() => {
+    removePins();
+    renderPins(checkAllFilters(advertise));
+  }));
+}, () => showErrorMessage(createErrorMessage));
 
 export { getData, sendData };
